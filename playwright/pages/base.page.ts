@@ -17,8 +17,8 @@ export class BasePage {
     this.navbarBrand = page.getByRole('link', { name: 'holistiplan' });
     this.homeLink = page.getByRole('link', { name: 'Home' });
     this.aboutLink = page.getByRole('link', { name: 'About' });
-    this.signUpNavLink = page.getByTestId('sign-up-link');
-    this.signInNavLink = page.getByTestId('log-in-link');
+    this.signUpNavLink = page.locator('#sign-up-link');
+    this.signInNavLink = page.locator('#log-in-link');
   }
 
   /**
