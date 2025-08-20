@@ -164,43 +164,30 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Get reward card by index
+   * Get reward card by title (recommended for order-independent tests)
    */
-  getRewardCard(index: number): Locator {
-    return this.rewardCards.nth(index);
+  getRewardCardByTitle(title: string): Locator {
+    return this.rewardCards.filter({ hasText: title });
   }
 
   /**
-   * Wait for reward card to be fully loaded
+   * Wait for reward card to be fully loaded by title
    */
-  async waitForRewardCard(index: number) {
-    const card = this.getRewardCard(index);
+  async waitForRewardCardByTitle(title: string) {
+    const card = this.getRewardCardByTitle(title);
     await card.waitFor({ state: 'visible', timeout: 10000 });
     await card.locator('.reward-claim a').waitFor({ state: 'visible', timeout: 10000 });
   }
 
   /**
-   * Get reward card title by index
+   * Get reward card points by title
    */
-  async getRewardCardTitle(index: number): Promise<string> {
-    const card = this.getRewardCard(index);
-    const title = card.locator('.card-header .h4');
-    const text = await title.textContent();
-    if (!text) {
-      throw new Error(`Reward card title not found for index ${index}`);
-    }
-    return text;
-  }
-
-  /**
-   * Get reward card points by index
-   */
-  async getRewardCardPoints(index: number): Promise<string> {
-    const card = this.getRewardCard(index);
+  async getRewardCardPointsByTitle(title: string): Promise<string> {
+    const card = this.getRewardCardByTitle(title);
     const points = card.locator('.card-header .h5');
     const text = await points.textContent();
     if (!text) {
-      throw new Error(`Reward card points not found for index ${index}`);
+      throw new Error(`Reward card points not found for title "${title}"`);
     }
     // Remove "pts" from the text, parse as number, and format consistently
     const numberText = text.replace('pts', '').trim();
@@ -209,33 +196,35 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Get reward card description by index
+   * Get reward card description by title
    */
-  async getRewardCardDescription(index: number): Promise<string> {
-    const card = this.getRewardCard(index);
+  async getRewardCardDescriptionByTitle(title: string): Promise<string> {
+    const card = this.getRewardCardByTitle(title);
     const description = card.locator('.card-body p');
     const text = await description.textContent();
     if (!text) {
-      throw new Error(`Reward card description not found for index ${index}`);
+      throw new Error(`Reward card description not found for title "${title}"`);
     }
     return text;
   }
 
+
+
   /**
-   * Click redeem button for a specific reward card
+   * Click redeem button for a specific reward card by title
    */
-  async clickRedeemReward(index: number) {
-    await this.waitForRewardCard(index);
-    const card = this.getRewardCard(index);
+  async clickRedeemRewardByTitle(title: string) {
+    await this.waitForRewardCardByTitle(title);
+    const card = this.getRewardCardByTitle(title);
     const redeemButton = card.getByText('Redeem this Reward');
     await redeemButton.click();
   }
 
   /**
-   * Click unredeem button for a specific reward card
+   * Click unredeem button for a specific reward card by title
    */
-  async clickUnredeemReward(index: number) {
-    const card = this.getRewardCard(index);
+  async clickUnredeemRewardByTitle(title: string) {
+    const card = this.getRewardCardByTitle(title);
     const unredeemButton = card.getByText('Un-redeem');
     await unredeemButton.click();
   }
@@ -293,34 +282,23 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Check if a reward card is redeemed
+   * Check if a reward card is redeemed by title
    */
-  async isRewardRedeemed(index: number): Promise<boolean> {
-    const card = this.getRewardCard(index);
+  async isRewardRedeemedByTitle(title: string): Promise<boolean> {
+    const card = this.getRewardCardByTitle(title);
     const unredeemButton = card.getByText('Un-redeem');
     return await unredeemButton.isVisible();
   }
 
   /**
-   * Check if a reward card is available for redemption
+   * Get complete reward card data including state by title
    */
-  async isRewardAvailable(index: number): Promise<boolean> {
-    await this.waitForRewardCard(index);
-    const card = this.getRewardCard(index);
-    const redeemButton = card.getByText('Redeem this Reward');
-    return await redeemButton.isVisible();
-  }
-
-  /**
-   * Get complete reward card data including state
-   */
-  async getRewardCardData(index: number): Promise<RewardCard> {
-    const card = this.getRewardCard(index);
-    const id = await card.getAttribute('data-reward-id') || index.toString();
-    const title = await this.getRewardCardTitle(index);
-    const points = await this.getRewardCardPoints(index);
-    const description = await this.getRewardCardDescription(index);
-    const isRedeemed = await this.isRewardRedeemed(index);
+  async getRewardCardDataByTitle(title: string): Promise<RewardCard> {
+    const card = this.getRewardCardByTitle(title);
+    const id = await card.getAttribute('data-reward-id') || title;
+    const points = await this.getRewardCardPointsByTitle(title);
+    const description = await this.getRewardCardDescriptionByTitle(title);
+    const isRedeemed = await this.isRewardRedeemedByTitle(title);
     
     return {
       id,
@@ -332,14 +310,11 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Verify reward card data matches expected values
+   * Verify reward card data matches expected values by title
    */
-  async expectRewardCardData(index: number, expectedData: Partial<RewardCard>) {
-    const actualData = await this.getRewardCardData(index);
+  async expectRewardCardDataByTitle(title: string, expectedData: Partial<RewardCard>) {
+    const actualData = await this.getRewardCardDataByTitle(title);
     
-    if (expectedData.title !== undefined) {
-      expect(actualData.title).toBe(expectedData.title);
-    }
     if (expectedData.points !== undefined) {
       expect(actualData.points).toBe(expectedData.points);
     }
@@ -352,19 +327,11 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Verify reward card is in redeemed state
+   * Verify reward card is in redeemed state by title
    */
-  async expectRewardRedeemed(index: number) {
-    await expect(this.getRewardCard(index).getByText('Un-redeem')).toBeVisible();
-    await expect(this.getRewardCard(index).getByText('Redeem this Reward')).not.toBeVisible();
-  }
-
-  /**
-   * Verify reward card is in available state
-   */
-  async expectRewardAvailable(index: number) {
-    await expect(this.getRewardCard(index).getByText('Redeem this Reward')).toBeVisible();
-    await expect(this.getRewardCard(index).getByText('Un-redeem')).not.toBeVisible();
+  async expectRewardRedeemedByTitle(title: string) {
+    await expect(this.getRewardCardByTitle(title).getByText('Un-redeem')).toBeVisible();
+    await expect(this.getRewardCardByTitle(title).getByText('Redeem this Reward')).not.toBeVisible();
   }
 
   /**
@@ -373,6 +340,15 @@ export class HomePage extends BasePage {
   async expectSuccessMessage(expectedMessage: string) {
     const successAlert = this.page.locator('.alert.alert-dismissible').filter({ hasText: expectedMessage });
     await expect(successAlert).toBeVisible();
+  }
+
+  /**
+   * Verify all expected rewards are present on the page
+   */
+  async expectAllRewardsPresent(expectedTitles: string[]) {
+    for (const title of expectedTitles) {
+      await expect(this.getRewardCardByTitle(title)).toBeVisible();
+    }
   }
 
   /**
