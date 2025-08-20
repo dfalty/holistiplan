@@ -24,7 +24,7 @@ export class LoginPage extends BasePage {
     
     // Page content
     this.pageTitle = page.getByRole('heading', { name: 'Sign In' });
-    this.errorMessage = page.getByRole('alert');
+    this.errorMessage = page.locator('.alert.alert-block.alert-danger');
   }
 
   /**

@@ -9,6 +9,7 @@ export class BasePage {
   readonly aboutLink: Locator;
   readonly signUpNavLink: Locator;
   readonly signInNavLink: Locator;
+  readonly signOutNavLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,6 +20,7 @@ export class BasePage {
     this.aboutLink = page.getByRole('link', { name: 'About' });
     this.signUpNavLink = page.locator('#sign-up-link');
     this.signInNavLink = page.locator('#log-in-link');
+    this.signOutNavLink = page.getByRole('link', { name: 'Sign Out' });
   }
 
   /**
@@ -47,6 +49,13 @@ export class BasePage {
    */
   async clickSignIn() {
     await this.signInNavLink.click();
+  }
+
+  /**
+   * Navigate to sign out page
+   */
+  async clickSignOut() {
+    await this.signOutNavLink.click();
   }
 
   /**

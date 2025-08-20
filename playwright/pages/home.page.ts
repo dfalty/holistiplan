@@ -371,7 +371,7 @@ export class HomePage extends BasePage {
    * Verify success message is displayed
    */
   async expectSuccessMessage(expectedMessage: string) {
-    const successAlert = this.page.locator('.alert.alert-dismissible.alert-info').filter({ hasText: expectedMessage });
+    const successAlert = this.page.locator('.alert.alert-dismissible').filter({ hasText: expectedMessage });
     await expect(successAlert).toBeVisible();
   }
 
