@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { HomePage } from '../pages/home.page';
 import {
-    REWARD_DATA,
-    getTotalRewardCost
+  REWARD_DATA,
+  getTotalRewardCost
 } from '../test-data/rewards';
 
 test.describe('Home Page', () => {
@@ -18,6 +18,11 @@ test.describe('Home Page', () => {
     test('should load home page correctly', async () => {
       await homePage.expectToBeOnHomePage();
       await homePage.expectPageLoaded();
+    });
+
+    test('should display all expected rewards', async () => {
+      const expectedTitles = REWARD_DATA.map(reward => reward.title);
+      await homePage.expectAllRewardsPresent(expectedTitles);
     });
 
     test('should display navigation elements', async () => {
@@ -99,19 +104,18 @@ test.describe('Home Page', () => {
         const initialPointsRedeemed = await homePage.getPointsRedeemed();
         
         // Validate reward exists and data is correct
-        await homePage.expectRewardCardData(reward.index, {
-          title: reward.title,
+        await homePage.expectRewardCardDataByTitle(reward.title, {
           points: reward.points.toString(),
           description: reward.description,
           isRedeemed: false
         });
         
         // Redeem the reward
-        await homePage.clickRedeemReward(reward.index);
+        await homePage.clickRedeemRewardByTitle(reward.title);
         await homePage.waitForPointsUpdate();
         
         // Verify reward is now redeemed
-        await homePage.expectRewardRedeemed(reward.index);
+        await homePage.expectRewardRedeemedByTitle(reward.title);
         
         // Verify points redeemed has increased (including the +2 bug)
         const newPointsRedeemed = await homePage.getPointsRedeemed();
@@ -134,25 +138,26 @@ test.describe('Home Page', () => {
 
   test.describe('Reward Redemption and Unredemption', () => {
     test('should allow redeeming and unredeeming a reward', async () => {
+      const firstReward = REWARD_DATA[0];
       const initialPoints = await homePage.getPointsRemaining();
-      const rewardPoints = await homePage.getRewardCardPoints(0);
+      const rewardPoints = await homePage.getRewardCardPointsByTitle(firstReward.title);
       
       // Start with available state
-      await homePage.expectRewardAvailable(0);
+      await homePage.expectRewardCardDataByTitle(firstReward.title, { isRedeemed: false });
       
       // Redeem the reward
-      await homePage.clickRedeemReward(0);
+      await homePage.clickRedeemRewardByTitle(firstReward.title);
       await homePage.waitForPointsUpdate();
-      await homePage.expectRewardRedeemed(0);
+      await homePage.expectRewardRedeemedByTitle(firstReward.title);
       
       // Verify points are deducted
       const pointsAfterRedemption = await homePage.getPointsRemaining();
       expect(parseFloat(pointsAfterRedemption)).toBe(parseFloat(initialPoints) - parseFloat(rewardPoints) - 2); // 2 points is the bug
       
       // Unredeem the reward
-      await homePage.clickUnredeemReward(0);
+      await homePage.clickUnredeemRewardByTitle(firstReward.title);
       await homePage.waitForPointsUpdate();
-      await homePage.expectRewardAvailable(0);
+      await homePage.expectRewardCardDataByTitle(firstReward.title, { isRedeemed: false });
       
       // Verify points are restored
       const finalPoints = await homePage.getPointsRemaining();
@@ -172,20 +177,18 @@ test.describe('Home Page', () => {
       const initialPointsRedeemed = await homePage.getPointsRedeemed();
       
       // Validate all rewards exist and are available
-      for (let i = 0; i < REWARD_DATA.length; i++) {
-        await homePage.expectRewardAvailable(i);
-        await homePage.expectRewardCardData(i, {
-          title: REWARD_DATA[i].title,
-          points: REWARD_DATA[i].points.toString(),
+      for (const reward of REWARD_DATA) {
+        await homePage.expectRewardCardDataByTitle(reward.title, {
+          points: reward.points.toString(),
           isRedeemed: false
         });
       }
       
       // Redeem all rewards
-      for (let i = 0; i < REWARD_DATA.length; i++) {
-        await homePage.clickRedeemReward(i);
+      for (const reward of REWARD_DATA) {
+        await homePage.clickRedeemRewardByTitle(reward.title);
         await homePage.waitForPointsUpdate();
-        await homePage.expectRewardRedeemed(i);
+        await homePage.expectRewardRedeemedByTitle(reward.title);
       }
       
       // Verify points redeemed has increased by total cost
@@ -215,12 +218,13 @@ test.describe('Home Page', () => {
       await homePage.clickForfeitPoints();
       await homePage.waitForPointsUpdate();
       
-      // Try to redeem a reward
-      await homePage.clickRedeemReward(0);
+      // Try to redeem a reward (use first reward from data)
+      const firstReward = REWARD_DATA[0];
+      await homePage.clickRedeemRewardByTitle(firstReward.title);
       await homePage.waitForPointsUpdate();
       
       // Verify the reward button shows as un-redeem
-      await homePage.expectRewardRedeemed(0);
+      await homePage.expectRewardRedeemedByTitle(firstReward.title);
       
       // Verify the "Claim my rewards" button remains disabled
       await homePage.expectClaimButtonDisabled();
@@ -231,8 +235,9 @@ test.describe('Home Page', () => {
       const initialPointsRedeemed = await homePage.getPointsRedeemed();
       const initialPointsRemaining = await homePage.getPointsRemaining();
       
-      // Redeem a reward
-      await homePage.clickRedeemReward(0);
+      // Redeem a reward (use first reward from data)
+      const firstReward = REWARD_DATA[0];
+      await homePage.clickRedeemRewardByTitle(firstReward.title);
       await homePage.waitForPointsUpdate();
       
       // Get points state after redemption
@@ -244,7 +249,7 @@ test.describe('Home Page', () => {
       await homePage.expectToBeOnHomePage();
       
       // Verify the reward is still redeemed
-      await homePage.expectRewardRedeemed(0);
+      await homePage.expectRewardRedeemedByTitle(firstReward.title);
       
       // Verify points redeemed maintains state
       const pointsRedeemedAfterRefresh = await homePage.getPointsRedeemed();
