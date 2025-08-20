@@ -284,3 +284,9 @@ webpack-stats.json
 /.idea/holistiplan.iml
 /.idea/misc.xml
 /.idea/vcs.xml
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
