@@ -85,8 +85,9 @@ test.describe('Authentication', () => {
     });
   });
 
-  test.describe('Sign Out', () => {
-    test('should successfully sign out after login', async () => {
+  test.describe('Account Data Persistence', () => {
+
+    test('should persist user points across login/logout cycles', async () => {
       // First, log in
       await loginPage.goto();
       await loginPage.fillLoginForm(VALID_USER.email, VALID_USER.password);
@@ -99,19 +100,38 @@ test.describe('Authentication', () => {
       await homePage.goto();
       await homePage.expectToBeOnHomePage();
       
-      // Click sign out nav button
+      // Get initial points
+      const initialPoints = await homePage.getPointsRemaining();
+      
+      // Add some points
+      await homePage.clickAddFivePoints();
+      await homePage.waitForPointsUpdate();
+      await homePage.clickAddFivePoints();
+      await homePage.waitForPointsUpdate();
+      
+      // Get points after adding
+      const pointsAfterAdding = await homePage.getPointsRemaining();
+      expect(parseFloat(pointsAfterAdding)).toBeGreaterThan(parseFloat(initialPoints));
+      
+      // Sign out
       await homePage.clickSignOut();
-      
-      // Verify sign out page loads
       await signOutPage.expectToBeOnSignOutPage();
-      await signOutPage.expectPageLoaded();
-      
-      // Click sign out button
       await signOutPage.clickSignOut();
-      
-      // Verify "You have signed out" message appears on home page
-      await homePage.expectToBeOnHomePage();
       await homePage.expectSuccessMessage('You have signed out.');
+      
+      // Sign back in
+      await loginPage.goto();
+      await loginPage.fillLoginForm(VALID_USER.email, VALID_USER.password);
+      await loginPage.submit();
+      await profilePage.expectToBeOnProfilePage();
+      
+      // Go back to home page
+      await homePage.goto();
+      await homePage.expectToBeOnHomePage();
+      
+      // Verify points are the same as before sign out
+      const pointsAfterReLogin = await homePage.getPointsRemaining();
+      expect(parseFloat(pointsAfterReLogin)).toBe(parseFloat(pointsAfterAdding));
     });
   });
 });
