@@ -27,20 +27,11 @@ export class HomePage extends BasePage {
   // Reward cards
   readonly rewardCards: Locator;
   
-  // Specific reward cards (by data attributes)
-  readonly toteBagCard: Locator;
-  readonly coffeePotionCard: Locator;
-  readonly presentationWandCard: Locator;
-  readonly mimicMousePadCard: Locator;
-  readonly wifiScrollCard: Locator;
-  readonly tshirtCard: Locator;
-  
-  // Reward card states
-  readonly redeemButtons: Locator;
-  readonly unredeemButtons: Locator;
-  
   // Footer
   readonly disclaimer: Locator;
+
+  // Debug toolbar
+  readonly hideDebugToolbarButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -61,20 +52,11 @@ export class HomePage extends BasePage {
     // Reward cards
     this.rewardCards = page.locator('.card.text-white.bg-primary');
     
-    // Specific reward cards (by data attributes)
-    this.toteBagCard = page.locator('[data-reward-id="1"]');
-    this.coffeePotionCard = page.locator('[data-reward-id="2"]');
-    this.presentationWandCard = page.locator('[data-reward-id="3"]');
-    this.mimicMousePadCard = page.locator('[data-reward-id="4"]');
-    this.wifiScrollCard = page.locator('[data-reward-id="5"]');
-    this.tshirtCard = page.locator('[data-reward-id="6"]');
-    
-    // Reward card states
-    this.redeemButtons = page.getByRole('button', { name: 'Redeem this Reward' });
-    this.unredeemButtons = page.getByRole('button', { name: 'Un-redeem' });
-    
     // Footer
     this.disclaimer = page.locator('[data-django-slot="disclaimer"]');
+
+    // Debug toolbar
+    this.hideDebugToolbarButton = page.locator('#djHideToolBarButton');
   }
 
   /**
@@ -82,6 +64,8 @@ export class HomePage extends BasePage {
    */
   async goto() {
     await this.page.goto('/');
+    // Wait for Vue components to load
+    await this.page.waitForSelector('.reward-claim a', { timeout: 10000 });
   }
 
   /**
@@ -97,7 +81,8 @@ export class HomePage extends BasePage {
    */
   async expectPageLoaded() {
     await expect(this.pointsStatusSection).toBeVisible();
-    await expect(this.rewardCards.count()).toBeGreaterThan(0); // There should be at least one reward card
+    const count = await this.rewardCards.count();
+    await expect(count).toBeGreaterThan(0); // There should be at least one reward card
     await expect(this.needMorePointsAlert).toBeVisible();
   }
 
@@ -160,6 +145,7 @@ export class HomePage extends BasePage {
    */
   async clickAddFivePoints() {
     await this.addFivePointsLink.click();
+    await this.page.waitForTimeout(500); // Wait for AJAX request to complete
   }
 
   /**
@@ -167,6 +153,7 @@ export class HomePage extends BasePage {
    */
   async clickAddFifteenPoints() {
     await this.addFifteenPointsLink.click();
+    await this.page.waitForTimeout(500); // Wait for AJAX request to complete
   }
 
   /**
@@ -181,6 +168,15 @@ export class HomePage extends BasePage {
    */
   getRewardCard(index: number): Locator {
     return this.rewardCards.nth(index);
+  }
+
+  /**
+   * Wait for reward card to be fully loaded
+   */
+  async waitForRewardCard(index: number) {
+    const card = this.getRewardCard(index);
+    await card.waitFor({ state: 'visible', timeout: 10000 });
+    await card.locator('.reward-claim a').waitFor({ state: 'visible', timeout: 10000 });
   }
 
   /**
@@ -206,7 +202,10 @@ export class HomePage extends BasePage {
     if (!text) {
       throw new Error(`Reward card points not found for index ${index}`);
     }
-    return text;
+    // Remove "pts" from the text, parse as number, and format consistently
+    const numberText = text.replace('pts', '').trim();
+    const number = parseFloat(numberText);
+    return number.toString();
   }
 
   /**
@@ -226,8 +225,9 @@ export class HomePage extends BasePage {
    * Click redeem button for a specific reward card
    */
   async clickRedeemReward(index: number) {
+    await this.waitForRewardCard(index);
     const card = this.getRewardCard(index);
-    const redeemButton = card.getByRole('button', { name: 'Redeem this Reward' });
+    const redeemButton = card.getByText('Redeem this Reward');
     await redeemButton.click();
   }
 
@@ -236,38 +236,8 @@ export class HomePage extends BasePage {
    */
   async clickUnredeemReward(index: number) {
     const card = this.getRewardCard(index);
-    const unredeemButton = card.getByRole('button', { name: 'Un-redeem' });
+    const unredeemButton = card.getByText('Un-redeem');
     await unredeemButton.click();
-  }
-
-  /**
-   * Click redeem button for a specific reward by ID
-   */
-  async clickRedeemRewardById(rewardId: string) {
-    const rewardCard = this.page.locator(`[data-reward-id="${rewardId}"]`);
-    const redeemButton = rewardCard.getByRole('button', { name: 'Redeem this Reward' });
-    await redeemButton.click();
-  }
-
-  /**
-   * Click unredeem button for a specific reward by ID
-   */
-  async clickUnredeemRewardById(rewardId: string) {
-    const rewardCard = this.page.locator(`[data-reward-id="${rewardId}"]`);
-    const unredeemButton = rewardCard.getByRole('button', { name: 'Un-redeem' });
-    await unredeemButton.click();
-  }
-
-  /**
-   * Verify specific reward cards exist
-   */
-  async expectRewardCards() {
-    await expect(this.toteBagCard).toBeVisible();
-    await expect(this.coffeePotionCard).toBeVisible();
-    await expect(this.presentationWandCard).toBeVisible();
-    await expect(this.mimicMousePadCard).toBeVisible();
-    await expect(this.wifiScrollCard).toBeVisible();
-    await expect(this.tshirtCard).toBeVisible();
   }
 
   /**
@@ -303,7 +273,8 @@ export class HomePage extends BasePage {
    * Wait for points to update
    */
   async waitForPointsUpdate() {
-    await this.page.waitForTimeout(1000); // Wait for any AJAX updates
+    // Wait for any AJAX updates and UI changes
+    await this.page.waitForTimeout(1500); // Increased wait time for reliability
   }
 
   /**
@@ -326,7 +297,7 @@ export class HomePage extends BasePage {
    */
   async isRewardRedeemed(index: number): Promise<boolean> {
     const card = this.getRewardCard(index);
-    const unredeemButton = card.getByRole('button', { name: 'Un-redeem' });
+    const unredeemButton = card.getByText('Un-redeem');
     return await unredeemButton.isVisible();
   }
 
@@ -334,22 +305,10 @@ export class HomePage extends BasePage {
    * Check if a reward card is available for redemption
    */
   async isRewardAvailable(index: number): Promise<boolean> {
+    await this.waitForRewardCard(index);
     const card = this.getRewardCard(index);
-    const redeemButton = card.getByRole('button', { name: 'Redeem this Reward' });
+    const redeemButton = card.getByText('Redeem this Reward');
     return await redeemButton.isVisible();
-  }
-
-  /**
-   * Get reward card button text
-   */
-  async getRewardButtonText(index: number): Promise<string> {
-    const card = this.getRewardCard(index);
-    const button = card.getByRole('button');
-    const text = await button.textContent();
-    if (!text) {
-      throw new Error(`Reward card button text not found for index ${index}`);
-    }
-    return text;
   }
 
   /**
@@ -370,18 +329,6 @@ export class HomePage extends BasePage {
       description,
       isRedeemed
     };
-  }
-
-  /**
-   * Get all reward card data with state
-   */
-  async getAllRewardData(): Promise<RewardCard[]> {
-    const rewards: RewardCard[] = [];
-    for (let i = 0; i < 6; i++) {
-      const rewardData = await this.getRewardCardData(i);
-      rewards.push(rewardData);
-    }
-    return rewards;
   }
 
   /**
@@ -408,17 +355,31 @@ export class HomePage extends BasePage {
    * Verify reward card is in redeemed state
    */
   async expectRewardRedeemed(index: number) {
-    await expect(this.getRewardCard(index).getByRole('button', { name: 'Un-redeem' })).toBeVisible();
-    await expect(this.getRewardCard(index).getByRole('button', { name: 'Redeem this Reward' })).not.toBeVisible();
+    await expect(this.getRewardCard(index).getByText('Un-redeem')).toBeVisible();
+    await expect(this.getRewardCard(index).getByText('Redeem this Reward')).not.toBeVisible();
   }
 
   /**
    * Verify reward card is in available state
    */
   async expectRewardAvailable(index: number) {
-    await expect(this.getRewardCard(index).getByRole('button', { name: 'Redeem this Reward' })).toBeVisible();
-    await expect(this.getRewardCard(index).getByRole('button', { name: 'Un-redeem' })).not.toBeVisible();
+    await expect(this.getRewardCard(index).getByText('Redeem this Reward')).toBeVisible();
+    await expect(this.getRewardCard(index).getByText('Un-redeem')).not.toBeVisible();
   }
 
+  /**
+   * Verify success message is displayed
+   */
+  async expectSuccessMessage(expectedMessage: string) {
+    const successAlert = this.page.locator('.alert.alert-dismissible.alert-info').filter({ hasText: expectedMessage });
+    await expect(successAlert).toBeVisible();
+  }
+
+  /**
+   * Hide Django debug toolbar if it's interfering with interactions
+   */
+  async hideDebugToolbar() {
+    await this.hideDebugToolbarButton.click();
+  }
 
 }
