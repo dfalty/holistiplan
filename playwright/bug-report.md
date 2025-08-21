@@ -42,7 +42,7 @@ Clicking the "About" link in the navigation redirects to `about//test` instead o
 **Severity Assessment**: Medium.
 This prevents users from accessing the About page entirely, which could contain important information about the application.
 
-**Status**: Open
+**Status**: Fixed
 
 ---
 
