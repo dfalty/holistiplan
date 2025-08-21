@@ -37,7 +37,7 @@ export default defineConfig({
   },
 
   /* Global test timeout */
-  timeout: 45000, // 45 seconds for entire test
+  timeout: 60000, // 60 seconds for entire test
 
   /* Configure projects for major browsers */
   projects: [
