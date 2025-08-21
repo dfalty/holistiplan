@@ -117,13 +117,13 @@ test.describe('Home Page', () => {
         // Verify reward is now redeemed
         await homePage.expectRewardRedeemedByTitle(reward.title);
         
-        // Verify points redeemed has increased (including the +2 bug)
+        // Verify points redeemed has increased
         const newPointsRedeemed = await homePage.getPointsRedeemed();
-        expect(parseFloat(newPointsRedeemed)).toBe(parseFloat(initialPointsRedeemed) + reward.points + 2); // +2 points is the bug
+        expect(parseFloat(newPointsRedeemed)).toBe(parseFloat(initialPointsRedeemed) + reward.points);
         
-        // Verify points remaining has decreased (including the +2 bug)
+        // Verify points remaining has decreased
         const newPointsRemaining = await homePage.getPointsRemaining();
-        expect(parseFloat(newPointsRemaining)).toBe(parseFloat(initialPointsRemaining) - reward.points - 2); // +2 points is the bug
+        expect(parseFloat(newPointsRemaining)).toBe(parseFloat(initialPointsRemaining) - reward.points);
         
         // Claim the reward
         await homePage.clickClaimRewards();
@@ -152,7 +152,7 @@ test.describe('Home Page', () => {
       
       // Verify points are deducted
       const pointsAfterRedemption = await homePage.getPointsRemaining();
-      expect(parseFloat(pointsAfterRedemption)).toBe(parseFloat(initialPoints) - parseFloat(rewardPoints) - 2); // 2 points is the bug
+      expect(parseFloat(pointsAfterRedemption)).toBe(parseFloat(initialPoints) - parseFloat(rewardPoints));
       
       // Unredeem the reward
       await homePage.clickUnredeemRewardByTitle(firstReward.title);
@@ -193,7 +193,7 @@ test.describe('Home Page', () => {
       
       // Verify points redeemed has increased by total cost
       const newPointsRedeemed = await homePage.getPointsRedeemed();
-      const totalCost = getTotalRewardCost() + (REWARD_DATA.length * 2); // 2 points per reward is the bug
+      const totalCost = getTotalRewardCost();
       expect(parseFloat(newPointsRedeemed)).toBe(parseFloat(initialPointsRedeemed) + totalCost);
       
       // Verify points remaining has decreased by total cost

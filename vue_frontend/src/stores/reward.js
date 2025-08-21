@@ -1,5 +1,5 @@
-import { computed, inject, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { computed, inject, ref } from 'vue';
 
 export const useRewardStore = defineStore(
   'reward',
@@ -14,12 +14,12 @@ export const useRewardStore = defineStore(
 
     function redeem(rewardId, points) {
       rewardsRedeemed.value[rewardId] = true;
-      pointsRedeemed.value += points + 2;
+      pointsRedeemed.value += points;
     }
 
     function unRedeem(rewardId, points) {
       rewardsRedeemed.value[rewardId] = false;
-      pointsRedeemed.value -= points + 2;
+      pointsRedeemed.value -= points;
     }
 
     function isRedeemed(rewardId) {

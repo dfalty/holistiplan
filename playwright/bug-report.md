@@ -63,7 +63,7 @@ The displayed point values for all rewards are consistently 2 points higher than
 **Severity Assessment**: High.
 Users may think they need more points than actually required, or may be confused about the true cost of rewards. This could significantly impact the user experience and trust in the system. Plus, I don't want to waste my hard earned points on an accounting issue!
 
-**Status**: Open
+**Status**: Fixed
 
 ---
 
