@@ -83,7 +83,7 @@ The sign-in page displays two identical "Forgot Password" links instead of just 
 **Severity Assessment**: Low.
 This is a UI duplication issue that doesn't break functionality but creates a confusing user interface.
 
-**Status**: Open
+**Status**: Fixed
 
 ### 5. Application Unresponsiveness
 
