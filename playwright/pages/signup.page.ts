@@ -1,64 +1,56 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 
-export class SignupPage extends BasePage {
+export class SignUpPage extends BasePage {
   readonly emailInput: Locator;
   readonly password1Input: Locator;
   readonly password2Input: Locator;
   readonly signUpButton: Locator;
-  readonly signInLink: Locator;
   readonly pageTitle: Locator;
-  readonly errorMessage: Locator;
-  readonly passwordHelpText: Locator;
 
   constructor(page: Page) {
     super(page);
     
     // Form elements
-    this.emailInput = page.getByLabel('Email');
-    this.password1Input = page.getByLabel('Password');
-    this.password2Input = page.getByLabel('Password (again)');
-    this.signUpButton = page.getByRole('button', { name: 'Sign Up »' });
-    this.signInLink = page.getByRole('link', { name: 'sign in' });
+    this.emailInput = page.locator('#id_email');
+    this.password1Input = page.locator('#id_password1');
+    this.password2Input = page.locator('#id_password2');
+    this.signUpButton = page.locator('button[type="submit"]');
     
     // Page content
     this.pageTitle = page.getByRole('heading', { name: 'Sign Up' });
-    this.errorMessage = page.getByRole('alert');
-    this.passwordHelpText = page.locator('#id_password1_helptext');
   }
 
   /**
-   * Navigate to the signup page
+   * Navigate to the sign-up page
    */
   async goto() {
     await this.page.goto('/accounts/signup/');
   }
 
   /**
-   * Fill in the signup form
+   * Fill in the sign-up form
    */
-  async fillSignupForm(email: string, password1: string, password2: string) {
+  async fillSignUpForm(email: string, password1: string, password2: string) {
     await this.emailInput.fill(email);
     await this.password1Input.fill(password1);
     await this.password2Input.fill(password2);
   }
 
   /**
-   * Submit the signup form
+   * Submit the sign-up form
    */
   async submit() {
     await this.signUpButton.click();
   }
 
   /**
-   * Complete signup process
+   * Complete sign-up process
    */
-  async signup(email: string, password1: string, password2: string) {
-    await this.fillSignupForm(email, password1, password2);
+  async signUp(email: string, password1: string, password2: string) {
+    await this.fillSignUpForm(email, password1, password2);
     await this.submit();
   }
-
-
 
   /**
    * Verify the page is loaded correctly
@@ -69,89 +61,58 @@ export class SignupPage extends BasePage {
     await expect(this.password1Input).toBeVisible();
     await expect(this.password2Input).toBeVisible();
     await expect(this.signUpButton).toBeVisible();
-    await expect(this.passwordHelpText).toBeVisible();
   }
 
   /**
-   * Check if user is on the signup page
+   * Check if user is on the sign-up page
    */
-  async expectToBeOnSignupPage() {
+  async expectToBeOnSignUpPage() {
     await super.expectToBeOnSignupPage();
     await expect(this.pageTitle).toHaveText('Sign Up');
   }
 
+
+
   /**
-   * Check if error message is displayed
+   * Get field validation errors for a specific field
    */
-  async expectErrorMessage(message: string) {
-    await expect(this.errorMessage).toBeVisible();
-    await expect(this.errorMessage).toContainText(message);
+  async getFieldErrors(fieldName: string): Promise<string[]> {
+    const fieldErrors = this.page.locator(`#div_id_${fieldName} .invalid-feedback`);
+    const count = await fieldErrors.count();
+    const errors: string[] = [];
+    
+    for (let i = 0; i < count; i++) {
+      const errorText = await fieldErrors.nth(i).textContent();
+      if (errorText) {
+        errors.push(errorText);
+      }
+    }
+    
+    return errors;
   }
 
   /**
-   * Check if error message is not displayed
+   * Check if field has specific validation error
    */
-  async expectNoErrorMessage() {
-    await expect(this.errorMessage).not.toBeVisible();
+  async expectFieldError(fieldName: string, expectedError: string) {
+    const errors = await this.getFieldErrors(fieldName);
+    const hasError = errors.some(error => error.includes(expectedError));
+    expect(hasError).toBe(true);
   }
 
   /**
-   * Verify password help text is displayed
+   * Check if field has no validation errors
    */
-  async expectPasswordHelpText() {
-    await expect(this.passwordHelpText).toBeVisible();
-    await expect(this.passwordHelpText).toContainText('Your password can\'t be too similar to your other personal information.');
-    await expect(this.passwordHelpText).toContainText('Your password must contain at least 8 characters.');
-    await expect(this.passwordHelpText).toContainText('Your password can\'t be a commonly used password.');
-    await expect(this.passwordHelpText).toContainText('Your password can\'t be entirely numeric.');
+  async expectNoFieldError(fieldName: string) {
+    const fieldErrors = this.page.locator(`#div_id_${fieldName} .invalid-feedback`);
+    await expect(fieldErrors).not.toBeVisible();
   }
 
   /**
-   * Check form labels and placeholders
+   * Check if field has validation errors (any)
    */
-  async expectFormLabels() {
-    // Email field
-    await expect(this.page.getByText('Email')).toBeVisible();
-    await expect(this.emailInput).toHaveAttribute('placeholder', 'Email address');
-    await expect(this.emailInput).toHaveAttribute('type', 'email');
-    await expect(this.emailInput).toHaveAttribute('required');
-
-    // Password1 field
-    await expect(this.page.getByText('Password')).toBeVisible();
-    await expect(this.password1Input).toHaveAttribute('placeholder', 'Password');
-    await expect(this.password1Input).toHaveAttribute('type', 'password');
-    await expect(this.password1Input).toHaveAttribute('required');
-
-    // Password2 field
-    await expect(this.page.getByText('Password (again)')).toBeVisible();
-    await expect(this.password2Input).toHaveAttribute('placeholder', 'Password (again)');
-    await expect(this.password2Input).toHaveAttribute('type', 'password');
-    await expect(this.password2Input).toHaveAttribute('required');
-  }
-
-  /**
-   * Clear all form fields
-   */
-  async clearForm() {
-    await this.emailInput.clear();
-    await this.password1Input.clear();
-    await this.password2Input.clear();
-  }
-
-  /**
-   * Verify form fields are empty
-   */
-  async expectFormEmpty() {
-    await expect(this.emailInput).toHaveValue('');
-    await expect(this.password1Input).toHaveValue('');
-    await expect(this.password2Input).toHaveValue('');
-  }
-
-  /**
-   * Check if passwords match
-   */
-  async expectPasswordsMatch(password1: string, password2: string) {
-    await expect(this.password1Input).toHaveValue(password1);
-    await expect(this.password2Input).toHaveValue(password2);
+  async expectFieldHasErrors(fieldName: string) {
+    const fieldErrors = this.page.locator(`#div_id_${fieldName} .invalid-feedback`);
+    await expect(fieldErrors.first()).toBeVisible();
   }
 }

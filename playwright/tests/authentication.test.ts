@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { EmailVerificationPage } from '../pages/email-verification.page';
 import { HomePage } from '../pages/home.page';
 import { LoginPage } from '../pages/login.page';
 import { ProfilePage } from '../pages/profile.page';
 import { SignOutPage } from '../pages/signout.page';
+import { SignUpPage } from '../pages/signup.page';
 import { INVALID_CREDENTIALS, VALID_USER } from '../test-data/auth';
 
 test.describe('Authentication', () => {
@@ -10,12 +12,16 @@ test.describe('Authentication', () => {
   let profilePage: ProfilePage;
   let signOutPage: SignOutPage;
   let homePage: HomePage;
+  let signUpPage: SignUpPage;
+  let emailVerificationPage: EmailVerificationPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     profilePage = new ProfilePage(page);
     signOutPage = new SignOutPage(page);
     homePage = new HomePage(page);
+    signUpPage = new SignUpPage(page);
+    emailVerificationPage = new EmailVerificationPage(page);
   });
 
   test.describe('Login', () => {
@@ -132,6 +138,70 @@ test.describe('Authentication', () => {
       // Verify points are the same as before sign out
       const pointsAfterReLogin = await homePage.getPointsRemaining();
       expect(parseFloat(pointsAfterReLogin)).toBe(parseFloat(pointsAfterAdding));
+    });
+  });
+
+  test.describe('Sign Up', () => {
+    test('should successfully complete sign-up flow', async () => {
+      // Navigate to sign-up page
+      await signUpPage.goto();
+      await signUpPage.expectToBeOnSignUpPage();
+      await signUpPage.expectPageLoaded();
+      
+      // Fill out the sign-up form with valid data
+      const testEmail = 'testuser@example.com';
+      const testPassword = 'SecurePass123!';
+      
+      await signUpPage.fillSignUpForm(testEmail, testPassword, testPassword);
+      await signUpPage.submit();
+      
+      // Verify we're redirected to email verification page
+      await emailVerificationPage.expectToBeOnEmailVerificationPage();
+      await emailVerificationPage.expectPageLoaded();
+      
+      // Verify confirmation email message is displayed
+      await emailVerificationPage.expectConfirmationEmailSent(testEmail);
+      await emailVerificationPage.expectConfirmationMessage();
+
+      // TODO: Test email verification and login
+    });
+
+    test('should show error for password less than 8 characters', async () => {
+      // Navigate to sign-up page
+      await signUpPage.goto();
+      await signUpPage.expectToBeOnSignUpPage();
+      
+      // Fill out form with short password
+      const testEmail = 'testuser@example.com';
+      const shortPassword = 'short';
+      
+      await signUpPage.fillSignUpForm(testEmail, shortPassword, shortPassword);
+      await signUpPage.submit();
+      
+      // Verify we're still on sign-up page
+      await signUpPage.expectToBeOnSignUpPage();
+      
+      // Verify field-specific error message is displayed
+      await signUpPage.expectFieldError('password1', 'This password is too short');
+    });
+
+    test('should show error for entirely numeric password', async () => {
+      // Navigate to sign-up page
+      await signUpPage.goto();
+      await signUpPage.expectToBeOnSignUpPage();
+      
+      // Fill out form with numeric password
+      const testEmail = 'testuser@example.com';
+      const numericPassword = '12345678';
+      
+      await signUpPage.fillSignUpForm(testEmail, numericPassword, numericPassword);
+      await signUpPage.submit();
+      
+      // Verify we're still on sign-up page
+      await signUpPage.expectToBeOnSignUpPage();
+      
+      // Verify field-specific error message is displayed
+      await signUpPage.expectFieldError('password1', 'This password is entirely numeric');
     });
   });
 });
