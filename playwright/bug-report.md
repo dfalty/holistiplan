@@ -85,6 +85,8 @@ This is a UI duplication issue that doesn't break functionality but creates a co
 
 **Status**: Fixed
 
+---
+
 ### 5. Application Unresponsiveness
 
 **Name**: Platform becomes unresponsive frequently
