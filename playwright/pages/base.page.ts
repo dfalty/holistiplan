@@ -80,7 +80,7 @@ export class BasePage {
    * Check if user is on about page
    */
   async expectToBeOnAboutPage() {
-    await expect(this.page).toHaveURL('/about');
+    await expect(this.page).toHaveURL('/about/');
   }
 
   /**
