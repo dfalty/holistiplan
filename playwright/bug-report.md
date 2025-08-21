@@ -117,6 +117,6 @@ After refreshing the page, the "Points Remaining" section sometimes displays neg
 Unable to find reproduction steps.
 
 **Severity Assessment**: High.
-This could be a serious data bug that could confuse users and suggest system instability or data loss. The fact that it's intermittent makes it harder to debug but no less important to fix.
+This could be a serious data bug that could confuse users and suggest system instability or data loss. The fact that it's intermittent makes it harder to debug but no less important to fix. These types of state management issues can become a real headache. It probably has something to do with a sync problem between the frontend and the backend.
 
 **Status**: Open
