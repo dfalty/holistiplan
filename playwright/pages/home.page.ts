@@ -39,8 +39,8 @@ export class HomePage extends BasePage {
     // Points and rewards section
     this.pointsStatusSection = page.locator('#points-status');
     this.pointsAvailable = page.locator('[data-points-available]');
-    this.pointsRedeemed = page.locator('.card-header:has-text("Ponts Redeemed") + .card-body');
-    this.pointsRemaining = page.locator('.card-header:has-text("Ponts Remaining") + .card-body');
+    this.pointsRedeemed = page.locator('.card-header:has-text("Points Redeemed") + .card-body');
+    this.pointsRemaining = page.locator('.card-header:has-text("Points Remaining") + .card-body');
     this.claimRewardsButton = page.getByRole('button', { name: 'Claim my rewards' });
     
     // Points section
@@ -246,8 +246,8 @@ export class HomePage extends BasePage {
   async expectPointsDisplay() {
     await expect(this.pointsRedeemed).toBeVisible();
     await expect(this.pointsRemaining).toBeVisible();
-    await expect(this.page.getByText('Ponts Redeemed')).toBeVisible();
-    await expect(this.page.getByText('Ponts Remaining')).toBeVisible();
+    await expect(this.page.getByText('Points Redeemed')).toBeVisible();
+    await expect(this.page.getByText('Points Remaining')).toBeVisible();
   }
 
   /**

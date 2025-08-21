@@ -1,8 +1,8 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
-import { useRewardStore } from '@/stores/reward';
+import { computed, inject, ref, watch } from "vue";
+import { useRewardStore } from "@/stores/reward";
 
-defineOptions({ name: 'PointsStatus' });
+defineOptions({ name: "PointsStatus" });
 const props = defineProps({
   pointsAvailable: {
     type: Number,
@@ -14,8 +14,8 @@ const props = defineProps({
   },
 });
 
-const csrfToken = inject('csrfToken');
-const addPointsUrl = inject('addPointsUrl');
+const csrfToken = inject("csrfToken");
+const addPointsUrl = inject("addPointsUrl");
 
 const rewardStore = useRewardStore();
 const currentSelection = ref(rewardStore.redeemedIds);
@@ -37,7 +37,7 @@ watch(
     if (!rewardStore.submitInProgress) {
       currentSelection.value = redeemed;
     }
-  },
+  }
 );
 </script>
 
@@ -46,11 +46,11 @@ watch(
   <div class="container" v-show="!rewardStore.submitInProgress">
     <div class="row justify-content-around">
       <div class="col-4 text-center card bg-light p-0 h5">
-        <div class="card-header">Ponts Redeemed</div>
+        <div class="card-header">Points Redeemed</div>
         <div class="card-body">{{ rewardStore.pointsRedeemed }}</div>
       </div>
       <div class="col-4 text-center card bg-light p-0 h5">
-        <div class="card-header">Ponts Remaining</div>
+        <div class="card-header">Points Remaining</div>
         <div class="card-body" :class="{ 'text-danger': remainingPoints < 0 }">
           {{ remainingPoints }}
         </div>
@@ -126,7 +126,7 @@ watch(
 </template>
 <style lang="scss" scoped>
 /* We may directly import a subset of project scss */
-@import '../../../holistiplan/static/sass/custom_bootstrap_vars.scss';
+@import "../../../holistiplan/static/sass/custom_bootstrap_vars.scss";
 /* Scoped styles will apply only to this component */
 button[disabled] {
   background: $disabled-button-bg-color;
