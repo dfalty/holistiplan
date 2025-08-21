@@ -27,13 +27,13 @@ This directory contains the automated test suite for the HolistiPlan application
 ### Run All Tests
 
 ```bash
-npx playwright test
+npx playwright test --workers 1
 ```
 
 ### Run Tests in Headed Mode (see browser)
 
 ```bash
-npx playwright test --headed
+npx playwright test --headed --workers 1
 ```
 
 ### Run Specific Test File
@@ -47,6 +47,14 @@ npx playwright test authentication.test.ts
 ```bash
 npx playwright test --grep "should load home page"
 ```
+
+### Run Tests with Multiple Workers
+
+```bash
+npx playwright test --workers 5
+```
+
+Note: This approach caused performance issues in my environment and led to page load failures and test timeouts. Consider allocating additional CPU/memory resources.
 
 ### View Test Report
 
