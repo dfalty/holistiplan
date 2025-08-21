@@ -11,7 +11,6 @@ test.describe('Home Page', () => {
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
     await homePage.goto();
-    await homePage.hideDebugToolbar();
   });
 
   test.describe('Page Load and Structure', () => {

@@ -91,6 +91,7 @@ This is a UI duplication issue that doesn't break functionality but creates a co
 
 **Summary**
 The application frequently becomes unresponsive, with actions like page loads or button clicks taking up to 30 seconds to respond. This appears to be performance-related. Note: May be related to my specific environment.
+Note: Root cause identified as Django debug toolbar's excessive file watching causing constant reloads. Disabling the debug toolbar significantly reduced the frequency of hanging, though intermittent issues still occur.
 
 **Steps to Reproduce**
 
@@ -102,7 +103,7 @@ The application frequently becomes unresponsive, with actions like page loads or
 **Severity Assessment**: Critical.
 This is a severe performance issue that makes the application nearly unusable. Users will likely abandon the application if they have to wait 30 seconds for basic interactions.
 
-**Status**: Open
+**Status**: Fixed (Parially)
 
 ---
 

@@ -30,9 +30,6 @@ export class HomePage extends BasePage {
   // Footer
   readonly disclaimer: Locator;
 
-  // Debug toolbar
-  readonly hideDebugToolbarButton: Locator;
-
   constructor(page: Page) {
     super(page);
     
@@ -54,9 +51,6 @@ export class HomePage extends BasePage {
     
     // Footer
     this.disclaimer = page.locator('[data-django-slot="disclaimer"]');
-
-    // Debug toolbar
-    this.hideDebugToolbarButton = page.locator('#djHideToolBarButton');
   }
 
   /**
@@ -349,13 +343,6 @@ export class HomePage extends BasePage {
     for (const title of expectedTitles) {
       await expect(this.getRewardCardByTitle(title)).toBeVisible();
     }
-  }
-
-  /**
-   * Hide Django debug toolbar if it's interfering with interactions
-   */
-  async hideDebugToolbar() {
-    await this.hideDebugToolbarButton.click();
   }
 
 }

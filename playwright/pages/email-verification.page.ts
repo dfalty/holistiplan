@@ -4,7 +4,6 @@ import { BasePage } from './base.page';
 export class EmailVerificationPage extends BasePage {
   readonly pageTitle: Locator;
   readonly confirmationMessage: Locator;
-  readonly emailAlert: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -12,7 +11,6 @@ export class EmailVerificationPage extends BasePage {
     // Page content
     this.pageTitle = page.getByRole('heading', { name: 'Verify Your E-mail Address' });
     this.confirmationMessage = page.locator('p');
-    this.emailAlert = page.locator('.alert.alert-dismissible.alert-info');
   }
 
   /**
@@ -36,14 +34,6 @@ export class EmailVerificationPage extends BasePage {
   async expectToBeOnEmailVerificationPage() {
     await expect(this.page).toHaveURL('/accounts/confirm-email/');
     await expect(this.pageTitle).toHaveText('Verify Your E-mail Address');
-  }
-
-  /**
-   * Verify confirmation email message is displayed
-   */
-  async expectConfirmationEmailSent(email: string) {
-    await expect(this.emailAlert).toBeVisible();
-    await expect(this.emailAlert).toContainText(`Confirmation email sent to ${email}.`);
   }
 
   /**

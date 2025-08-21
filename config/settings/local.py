@@ -38,28 +38,29 @@ EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.c
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
+# DISABLED FOR PERFORMANCE - Uncomment to enable debug toolbar
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
+# INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa: F405
+# MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa: F405
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
-DEBUG_TOOLBAR_CONFIG = {
-    "DISABLE_PANELS": ["debug_toolbar.panels.redirects.RedirectsPanel"],
-    "SHOW_TEMPLATE_CONTEXT": True,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#     "DISABLE_PANELS": ["debug_toolbar.panels.redirects.RedirectsPanel"],
+#     "SHOW_TEMPLATE_CONTEXT": True,
+# }
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
-INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
-if env("USE_DOCKER") == "yes":
-    import socket
+# INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
+# if env("USE_DOCKER") == "yes":
+#     import socket
 
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
-    try:
-        _, _, ips = socket.gethostbyname_ex("node")
-        INTERNAL_IPS.extend(ips)
-    except socket.gaierror:
-        # The node container isn't started (yet?)
-        pass
+#     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+#     INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
+#     try:
+#         _, _, ips = socket.gethostbyname_ex("node")
+#         INTERNAL_IPS.extend(ips)
+#     except socket.gaierror:
+#         # The node container isn't started (yet?)
+#         pass
 
 # django-extensions
 # ------------------------------------------------------------------------------
@@ -79,3 +80,5 @@ VUE_FRONTEND_USE_DEV_SERVER = True
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+

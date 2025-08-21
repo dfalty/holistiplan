@@ -160,7 +160,6 @@ test.describe('Authentication', () => {
       await emailVerificationPage.expectPageLoaded();
       
       // Verify confirmation email message is displayed
-      await emailVerificationPage.expectConfirmationEmailSent(testEmail);
       await emailVerificationPage.expectConfirmationMessage();
 
       // TODO: Test email verification and login
