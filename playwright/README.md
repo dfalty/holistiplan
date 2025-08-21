@@ -1,6 +1,6 @@
 # Playwright Test Suite - HolistiPlan
 
-This directory contains the automated test suite for the HolistiPlan application using Playwright with TypeScript.
+This directory contains the automated test suite for the HolistiPlan test application using Playwright with TypeScript.
 
 ## Setup Steps
 
