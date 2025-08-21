@@ -1,8 +1,8 @@
-# Bug Report - HolistiPlan Application
+# Bug Report - HolistiPlan Test Application
 
 ## Overview
 
-This document contains the findings from exploratory testing of the HolistiPlan application.
+This document contains the findings from exploratory testing of the HolistiPlan test application.
 Note: Each bug includes a status section to track progress on fixes as I went ahead and fixed the ones affecting automated tests.
 
 ## Bugs Discovered
