@@ -22,7 +22,7 @@ The main page displays "Ponts Redeemed" and "Ponts Remaining" instead of the cor
 
 **Severity Assessment**: Low severity as a spelling issue, but since it appears in a prominent functional area of the main page, it should be prioritized for quick resolution.
 
-**Status**: Open
+**Status**: Fixed
 
 ---
 
