@@ -54,6 +54,10 @@ npx playwright test --grep "should load home page"
 npx playwright show-report
 ```
 
+### Test Failures
+
+**Note**: I experienced several test failures due to the application consistently hanging for extended periods on my machine. I maintained the 60-second timeouts as these simple tests should not take that long to complete. This performance issue has been documented in the bug report and may be environment-specific.
+
 ## Test Structure
 
 The test suite is organized into the following directory structure:
