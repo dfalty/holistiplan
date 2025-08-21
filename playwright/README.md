@@ -119,9 +119,10 @@ I chose **TypeScript** and **Playwright** for this assignment based on my recent
 
 #### Automated Testing Focus
 
-- **Critical Paths**: Authentication, core functionality
-- **Data Integrity**: Points system, reward interactions
-- **User Experience**: Form validation, error handling
+- **Authentication**: Log In, Data Persistence, Sign Up
+- **Rewards & Redemption Flows**: Points, Reward Redemption, Main application functionality
+
+These areas represent the most important user journeys and business-critical functionality.
 
 #### Fix Bugs
 
