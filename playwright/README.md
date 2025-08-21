@@ -64,7 +64,7 @@ npx playwright show-report
 
 ### Test Failures
 
-**Note**: I experienced several test failures due to the application consistently hanging for extended periods on my machine. I maintained the 60-second timeouts as these simple tests should not take that long to complete. This performance issue has been documented in the bug report and may be environment-specific.
+**Note**: You might encounter test failures due to the application hanging occasionally. I found that disabling the Django debug toolbar helped a lot with this, but you may still see some page load timeouts. Check the [bug report](./bug-report.md) for more details.
 
 ## Test Structure
 
@@ -114,7 +114,7 @@ I chose **TypeScript** and **Playwright** for this assignment based on my recent
 #### Manual Testing First
 
 - Conducted exploratory testing to understand the application
-- Documented bugs in `bug-report.md`
+- Documented bugs in [bug-report.md](./bug-report.md)
 - Created test cases to inform automated test priorities
 
 #### Automated Testing Focus
@@ -122,3 +122,7 @@ I chose **TypeScript** and **Playwright** for this assignment based on my recent
 - **Critical Paths**: Authentication, core functionality
 - **Data Integrity**: Points system, reward interactions
 - **User Experience**: Form validation, error handling
+
+#### Fix Bugs
+
+During test development, several tests failed as expected due to bugs discovered in the application. I tried to fix the issues to ensure a passing test suite. For detailed information about all identified bugs and their resolution status, see [bug-report.md](./bug-report.md).
